@@ -732,11 +732,15 @@ function! s:SynIdStyle(id)
 endf
 function! s:SynIdStart(id)
     let vec = s:GetHlVect(a:id)
-    return (vec[1] != ''? '<span style="'.(strlen(vec[0])?'color:'.vec[0].';': '').(strlen(vec[1])?'background:'.vec[1] : '').'">' : vec[0] != ''? '<font color='.vec[0].'>': '').(vec[2]?'<b>': '').(vec[3]?'<i>': '').(vec[4]?'<u>': '')
+    " TODO CHECK
+    "return (vec[1] != ''? '<span style="'.(strlen(vec[0])?'color:'.vec[0].';': '').(strlen(vec[1])?'background:'.vec[1] : '').'">' : vec[0] != ''? '<font color='.vec[0].'>': '').(vec[2]?'<b>': '').(vec[3]?'<i>': '').(vec[4]?'<u>': '')
+    return (vec[1] != ''? '<span style="'.(strlen(vec[0])?'color:'.vec[0].';': '').(strlen(vec[1])?'background:'.vec[1] : '').'">' : vec[0] != ''? '<font color='.vec[0].'>': '').(vec[2]?'<em>': '').(vec[3]?'<i>': '').(vec[4]?'<u>': '')
 endf
 function! s:SynIdEnd(id)
     let vec = s:GetHlVect(a:id)
-    return (vec[4]?'</u>': '').(vec[3]?'</i>': '').(vec[2]?'</b>': '').(vec[1] != ''?'</span>': vec[0] != ''? '</font>': '')
+    " TODO CHECK
+    "return (vec[4]?'</u>': '').(vec[3]?'</i>': '').(vec[2]?'</b>': '').(vec[1] != ''?'</span>': vec[0] != ''? '</font>': '')
+    return (vec[4]?'</u>': '').(vec[3]?'</i>': '').(vec[2]?'</em>': '').(vec[1] != ''?'</span>': vec[0] != ''? '</font>': '')
 endf
 function! s:SynIdWrap(id,text)
     return s:SynIdStart(a:id).a:text.s:SynIdEnd(a:id)
@@ -808,6 +812,10 @@ function! s:synIDSpec(y,x,normal)
 endf
 function! s:GetColoredText(lines,start,finish,height,topfill,lineEnd)
     let y = a:start 
+    " TODO CHECK
+    if exists("s:synIDfn")
+        unlet s:synIDfn
+    endif
     let s:synIDfn = &diff? function('s:DiffSynId'): function('synID')
     let realWidth = winwidth(winnr())
     let foldWidth = &foldcolumn 
@@ -875,6 +883,7 @@ function! s:GetColoredText(lines,start,finish,height,topfill,lineEnd)
                     let diffX = len(char)?len(char):1
                     if char == ''
                         if eol || !&list || !has_key(listChars,'eol')
+                            " TODO CHECK fill spaces
                             let diff = maxRealX - realX 
                             let char = fill_screen || diff_hlID(y, x)?repeat(' ',diff): ' '
                             let id = s:synIDSpec(y,x,0)
@@ -913,8 +922,11 @@ function! s:GetColoredText(lines,start,finish,height,topfill,lineEnd)
                                     endif
                                 endif
                             else
-                                let diff = 6
-                                let char = printf('<%04x>',char2nr(char))
+                                " TODO CHECK
+                                "let diff = 6
+                                "let char = printf('<%04x>',char2nr(char))
+                                let diff = strlen(char)
+                                let char = char
                             endif
                         endif
                     else
